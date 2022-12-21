@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -44,8 +44,27 @@ const Header = () => {
     }
   };
 
+  const lastScroll = useRef(0);
+  const [hideNav, setHideNav] = useState(false);
+  const [currentScroll, setCorrentScroll] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setCorrentScroll(window.scrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    currentScroll > lastScroll.current ? setHideNav(true) : setHideNav(false);
+    lastScroll.current = currentScroll;
+  }, [currentScroll]);
+
   return (
     <Box
+      className={hideNav ? "hideNav" : ""}
       position="fixed"
       top={0}
       left={0}
