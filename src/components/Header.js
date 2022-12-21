@@ -66,8 +66,12 @@ const Header = () => {
           <nav>
             <HStack spacing={8}>
               {socials.map(social => (
-                <a href={social.url}>
-                  <FontAwesomeIcon icon={social.icon} size="2x" />
+                <a key={social.url} href={social.url}>
+                  <FontAwesomeIcon
+                    key={social.url}
+                    icon={social.icon}
+                    size="2x"
+                  />
                 </a>
               ))}
             </HStack>
