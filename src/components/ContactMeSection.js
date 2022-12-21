@@ -16,6 +16,9 @@ import * as Yup from "yup";
 import FullScreenSection from "./FullScreenSection";
 import useSubmit from "../hooks/useSubmit";
 import { useAlertContext } from "../context/alertContext";
+import "@fortawesome/fontawesome-svg-core/styles.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 const LandingSection = () => {
   const { isLoading, response, submit } = useSubmit();
@@ -28,22 +31,26 @@ const LandingSection = () => {
       type: "",
       comment: "",
     },
+
     onSubmit: values => {
-      submit(formik.values);
-      onOpen(response.type, response.message);
-      if (response.type === "success") {
-        formik.resetForm();
-      }
+      submit(null, values);
     },
     validationSchema: Yup.object({
       firstName: Yup.string().required("Required"),
       email: Yup.string().email("Invalid email").required("Required"),
-      type: Yup.string().required("Required"),
       comment: Yup.string()
-        .min(25, "Comment must be longer than 25 characters")
+        .min(25, "Must be at least 25 characters")
         .required("Required"),
     }),
   });
+
+  useEffect(() => {
+    if (response) {
+      if (response.type === "success") formik.resetForm();
+      else response.type = null;
+      onOpen(response.type, response.message);
+    }
+  }, [response]);
 
   return (
     <FullScreenSection
@@ -66,6 +73,7 @@ const LandingSection = () => {
                 <Input
                   id="firstName"
                   name="firstName"
+                  type="text"
                   onBlur={formik.handleBlur}
                   onChange={formik.handleChange}
                   value={formik.values.firstName}
@@ -91,9 +99,8 @@ const LandingSection = () => {
                 <Select
                   id="type"
                   name="type"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
                   value={formik.values.type}
+                  onChange={formik.handleChange}
                 >
                   <option value="hireMe">Freelance project proposal</option>
                   <option value="openSource">
@@ -116,8 +123,17 @@ const LandingSection = () => {
                 />
                 <FormErrorMessage>{formik.errors.comment}</FormErrorMessage>
               </FormControl>
-              <Button type="submit" colorScheme="purple" width="full">
-                Submit
+              <Button
+                type="submit"
+                colorScheme="purple"
+                width="full"
+                disabled={isLoading ? true : false}
+              >
+                {isLoading ? (
+                  <FontAwesomeIcon icon={faSpinner} spin={true} />
+                ) : (
+                  "Submit"
+                )}
               </Button>
             </VStack>
           </form>
